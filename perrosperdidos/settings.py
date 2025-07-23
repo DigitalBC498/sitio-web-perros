@@ -11,18 +11,16 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Configuración para Render
-if os.environ.get('RENDER'):
-    DEBUG = False
-    ALLOWED_HOSTS = ['*']
-
+if os.environ.get('RENDER'):  # detecta que estás en Render
     DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+        'default': dj_database_url.parse(
+            'postgresql://perrosperdidos_db_user:Jv96iNRJQQ7bonAONWjif2616GXaqO9L@dpg-d20n2ebipnbc73df5uv0-a/perrosperdidos_db',
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
-
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 else:
-    # Base de datos local
+    # Local - sqlite3 para desarrollo local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
