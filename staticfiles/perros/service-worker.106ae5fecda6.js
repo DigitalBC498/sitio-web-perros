@@ -7,13 +7,6 @@ const urlsToCache = [
   // Agregá acá otras rutas estáticas que uses, ej. CSS, JS, imágenes
 ];
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/static/perros/service-worker.js')
-    .then(reg => console.log('Service worker registrado:', reg))
-    .catch(err => console.error('Error al registrar:', err));
-}
-
-
 // Instalación: cachear archivos esenciales
 self.addEventListener('install', event => {
   event.waitUntil(
