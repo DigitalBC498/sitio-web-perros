@@ -6,15 +6,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-4@ejgy-1@xnj(#7wh092pe20@*006!lk*y2t4qov7@ts5#2^t5'
 
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = not os.environ.get('RENDER')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Configuración para Render
 if os.environ.get('RENDER'):
     DEBUG = False
     ALLOWED_HOSTS = ['*']
+    DATABASES = {
+        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    }
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    DEBUG = True
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-    # Base de datos en Render
+
+# Base de datos en Render
     DATABASES = {
         'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
     }

@@ -1,1 +1,1 @@
-web: gunicorn perrosperdidos.wsgi
+web: gunicorn perrosperdidos.wsgi --log-file -
