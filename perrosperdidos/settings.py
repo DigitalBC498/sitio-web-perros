@@ -1,47 +1,32 @@
-from pathlib import Path
 import os
+from pathlib import Path
 import dj_database_url
 
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-os.path.join(BASE_DIR, 'static')
-SECRET_KEY = 'django-insecure-4@ejgy-1@xnj(#7wh092pe20@*006!lk*y2t4qov7@ts5#2^t5'
+# Seguridad
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'clave-secreta-desarrollo')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
-DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-# Configuración para Render
-if os.environ.get('RENDER'):  # detecta que estás en Render
-    DATABASES = {
-        'default': dj_database_url.parse(
-            'postgresql://perrosperdidos_db_user:Jv96iNRJQQ7bonAONWjif2616GXaqO9L@dpg-d20n2ebipnbc73df5uv0-a/perrosperdidos_db',
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-else:
-    # Local - sqlite3 para desarrollo local
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-
-
+# Aplicaciones
 INSTALLED_APPS = [
-    'perros',
-    'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'perros',  # tu app
+    'rest_framework',  # si usás DRF
+    'corsheaders',     # si usás CORS
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # si usás CORS
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,7 +40,7 @@ ROOT_URLCONF = 'perrosperdidos.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Puedes agregar rutas aquí si tenés templates fuera de apps
+        'DIRS': [BASE_DIR / 'templates'],  # si usás templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,32 +55,37 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'perrosperdidos.wsgi.application'
 
+# Base de datos
+DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASES = {
+    'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+}
+
+# Validación de contraseña
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# Internacionalización
+LANGUAGE_CODE = 'es-ar'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_TZ = True
 
+# Archivos estáticos y media
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Extra: para whitenoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS (opcional)
+CORS_ALLOW_ALL_ORIGINS = True
