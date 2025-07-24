@@ -24,5 +24,3 @@ urlpatterns = [
     path('', include('perros.urls')),  # o el nombre de tu app
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
